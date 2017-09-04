@@ -23,7 +23,8 @@
     
 @property (nonatomic, strong) UIView * _Nonnull attachmentView;
 @property (nonatomic, weak) id<XLPopoverViewDelegate> _Nullable delegate;
-@property (nonatomic, strong) NSArray<XLPopoverCellModel *> * _Nonnull dataArray;;
+@property (nonatomic, strong) NSArray<XLPopoverCellModel *> * _Nonnull dataArray;
+@property (nonatomic, strong) UIColor * _Nullable popoverColor ;
     
 - (void)show ;
 
@@ -35,6 +36,7 @@
     
 @property (nonatomic, strong) NSString * _Nullable imageName ;
 @property (nonatomic, strong) NSString * _Nonnull title ;
+@property (nonatomic, strong) UIColor * _Nullable textColor;
     
 + (instancetype _Nonnull)modelWithImage:(NSString * _Nullable)imageName title:(NSString  * _Nonnull )title ;
 

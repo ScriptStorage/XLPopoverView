@@ -40,18 +40,21 @@
                         ];
     NSArray *titles = @[
                         @"创建群聊",@"加好友/群",@"扫一扫",@"面对面快传",@"付款",
-                        @"拍摄",@"面对面红包",@"创建群聊/或搜索群/或搜索群",@"加好友/群",
-                        @"创建群聊",@"加好友/群",@"扫一扫",@"面对面快传",@"付款",
+//                        @"拍摄",@"面对面红包",@"创建群聊/或搜索群/或搜索群",@"加好友/群",
+//                        @"创建群聊",@"加好友/群",@"扫一扫",@"面对面快传",@"付款",
                         ];
     NSMutableArray *array = [NSMutableArray array];
     for (int i = 0 ; i < titles.count; i++) {
-        [array addObject:[XLPopoverCellModel modelWithImage:images[i] title:titles[i]]];
+        XLPopoverCellModel *model = [XLPopoverCellModel modelWithImage:images[i] title:titles[i]];
+//        model.textColor = [UIColor redColor];
+        [array addObject:model];
     }
     
     XLPopoverView *pop = [[XLPopoverView alloc] initWithFrame:self.view.bounds];
     pop.delegate = self;
     pop.attachmentView = sender;
     pop.dataArray = [array copy];
+//    pop.popoverColor = [UIColor lightGrayColor];
     [pop show];
 }
 

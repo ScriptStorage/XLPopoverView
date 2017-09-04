@@ -66,6 +66,10 @@ static CGFloat AnimateDuration = 0.25;
     
     _triangleLayer.path = [self trianglePath].CGPath;
     
+    if (self.popoverColor) {
+        _tableView.backgroundColor = self.popoverColor;
+    }
+    
 }
     
 #pragma mark - 私有方法
@@ -171,8 +175,9 @@ static CGFloat AnimateDuration = 0.25;
     
 - (void)show {
     
-    NSCAssert(self.attachmentView, @"必须设置attachmentView属性!");
-    NSCAssert([self.attachmentView respondsToSelector:@selector(convertRect:toView:)], @"self.attachmentView不支持convertRect:toView:方法!可能是self.attachmentView不是UIView的子类!");
+    NSCAssert(self.attachmentView, @"XLPopoverView没有设置必要的attachmentView属性!");
+    NSCAssert(self.dataArray, @"XLPopoverView没有设置必要的dataArray属性!");
+    NSCAssert([self.attachmentView respondsToSelector:@selector(convertRect:toView:)], @"XLPopoverView的attachmentView不支持convertRect:toView:方法!可能是self.attachmentView不是UIView的子类!");
     
     UIView *rootView = [UIApplication sharedApplication].keyWindow.rootViewController.view;
     [rootView addSubview:self];
@@ -319,6 +324,8 @@ static CGFloat AnimateDuration = 0.25;
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
+        self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
+        
         UIImageView *imageView = [[UIImageView alloc] init];
         imageView.contentMode = UIViewContentModeScaleAspectFit;
 //        imageView.backgroundColor = [UIColor randomColorWithAlpha:.4];
@@ -349,6 +356,9 @@ static CGFloat AnimateDuration = 0.25;
     _model = model;
     _iconView.image = [UIImage imageNamed:_model.imageName];
     _titleLabel.text = _model.title;
+    if (_model.textColor) {
+        _titleLabel.textColor = _model.textColor;
+    }
 }
 
 @end
