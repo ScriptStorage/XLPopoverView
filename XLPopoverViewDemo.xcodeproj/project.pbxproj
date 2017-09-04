@@ -13,6 +13,7 @@
 		EC44DBE71F5D5A7E00C257BD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EC44DBE51F5D5A7E00C257BD /* Main.storyboard */; };
 		EC44DBE91F5D5A7E00C257BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EC44DBE81F5D5A7E00C257BD /* Assets.xcassets */; };
 		EC44DBEC1F5D5A7E00C257BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EC44DBEA1F5D5A7E00C257BD /* LaunchScreen.storyboard */; };
+		EC44DBF61F5D5AAC00C257BD /* XLPopoverView.m in Sources */ = {isa = PBXBuildFile; fileRef = EC44DBF51F5D5AAC00C257BD /* XLPopoverView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,8 @@
 		EC44DBE81F5D5A7E00C257BD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EC44DBEB1F5D5A7E00C257BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		EC44DBED1F5D5A7E00C257BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EC44DBF41F5D5AAC00C257BD /* XLPopoverView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XLPopoverView.h; sourceTree = "<group>"; };
+		EC44DBF51F5D5AAC00C257BD /* XLPopoverView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XLPopoverView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +61,7 @@
 		EC44DBDB1F5D5A7D00C257BD /* XLPopoverViewDemo */ = {
 			isa = PBXGroup;
 			children = (
+				EC44DBF31F5D5AAC00C257BD /* XLPopoverView */,
 				EC44DBDF1F5D5A7E00C257BD /* AppDelegate.h */,
 				EC44DBE01F5D5A7E00C257BD /* AppDelegate.m */,
 				EC44DBE21F5D5A7E00C257BD /* ViewController.h */,
@@ -77,6 +81,15 @@
 				EC44DBDD1F5D5A7E00C257BD /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		EC44DBF31F5D5AAC00C257BD /* XLPopoverView */ = {
+			isa = PBXGroup;
+			children = (
+				EC44DBF41F5D5AAC00C257BD /* XLPopoverView.h */,
+				EC44DBF51F5D5AAC00C257BD /* XLPopoverView.m */,
+			);
+			path = XLPopoverView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -151,6 +164,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC44DBF61F5D5AAC00C257BD /* XLPopoverView.m in Sources */,
 				EC44DBE41F5D5A7E00C257BD /* ViewController.m in Sources */,
 				EC44DBE11F5D5A7E00C257BD /* AppDelegate.m in Sources */,
 				EC44DBDE1F5D5A7E00C257BD /* main.m in Sources */,
