@@ -70,7 +70,6 @@
     pop.delegate = self;
     pop.attachmentView = sender;
     pop.dataArray = [array copy];
-//    pop.popoverColor = [UIColor lightGrayColor];
     [pop show];
 }
 
