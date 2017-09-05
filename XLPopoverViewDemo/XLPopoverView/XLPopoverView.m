@@ -177,7 +177,7 @@ static CGFloat AnimateDuration = 0.25;
     
     NSCAssert(self.attachmentView, @"XLPopoverView没有设置必要的attachmentView属性!");
     NSCAssert(self.dataArray, @"XLPopoverView没有设置必要的dataArray属性!");
-    NSCAssert([self.attachmentView respondsToSelector:@selector(convertRect:toView:)], @"XLPopoverView的attachmentView不支持convertRect:toView:方法!可能是self.attachmentView不是UIView的子类!");
+    NSCAssert([self.attachmentView respondsToSelector:@selector(convertRect:toView:)], @"XLPopoverView的attachmentView不支持convertRect:toView:方法!可能是attachmentView不是UIView的子类!");
     
     UIView *rootView = [UIApplication sharedApplication].keyWindow.rootViewController.view;
     [rootView addSubview:self];

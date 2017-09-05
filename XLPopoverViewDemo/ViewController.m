@@ -8,9 +8,10 @@
 
 #import "ViewController.h"
 #import "XLPopoverView.h"
+#import "UIColor+Hex.h"
 
-@interface ViewController ()<XLPopoverViewDelegate> {
-    UIButton *_btn;
+@interface ViewController ()<XLPopoverViewDelegate, UICollectionViewDelegate, UICollectionViewDataSource> {
+    
 }
 
 @end
@@ -20,15 +21,30 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+    layout.itemSize = CGSizeMake(20, 20);
+    layout.minimumLineSpacing = 5;
+    layout.minimumInteritemSpacing = 5;
+    
+    
+    UICollectionView *collection = [[UICollectionView alloc] initWithFrame:self.view.bounds collectionViewLayout:layout];
+    collection.delegate   = self;
+    collection.dataSource = self;
+    [collection registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"Cell"];
+    collection.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:collection];
+    
+    UIBarButtonItem *item1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(btnClicked:)];
+    
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn.frame = CGRectMake(300, 300, 20, 20);
+    btn.frame = CGRectMake(0, 0, 44, 44);
+    btn.backgroundColor = [UIColor randomColor];
+    [btn setTitle:@"C" forState:UIControlStateNormal];
+    [btn setTitleColor:[UIColor randomColor] forState:UIControlStateNormal];
     [btn addTarget:self action:@selector(btnClicked:) forControlEvents:UIControlEventTouchUpInside];
-    btn.backgroundColor = [UIColor cyanColor];
     
-    [self.view addSubview:btn];
-    
-    _btn = btn;
-    
+    UIBarButtonItem *item2 = [[UIBarButtonItem alloc] initWithCustomView:btn];
+    self.navigationItem.rightBarButtonItems = @[item1, item2];
 }
     
 - (void)btnClicked:(UIView *)sender{
@@ -40,7 +56,7 @@
                         ];
     NSArray *titles = @[
                         @"创建群聊",@"加好友/群",@"扫一扫",@"面对面快传",@"付款",
-//                        @"拍摄",@"面对面红包",@"创建群聊/或搜索群/或搜索群",@"加好友/群",
+                        @"拍摄",@"面对面红包",@"创建群聊/或搜索群/或搜索群",@"加好友/群",
 //                        @"创建群聊",@"加好友/群",@"扫一扫",@"面对面快传",@"付款",
                         ];
     NSMutableArray *array = [NSMutableArray array];
@@ -60,6 +76,28 @@
 
 - (void)popoverView:(XLPopoverView * _Nonnull)popoverView index:(NSInteger)index {
     NSLog(@"%ld",index);
+}
+
+#pragma mark - UICollectionViewDelegate and UICollectionViewDataSource
+
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
+    return 1;
+}
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
+    return 10000;
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
+    
+    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"Cell" forIndexPath:indexPath];
+    cell.backgroundColor = [UIColor randomColorWithAlpha:0.5];
+    
+    return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    [self btnClicked:[collectionView cellForItemAtIndexPath:indexPath]];
 }
 
 @end
