@@ -69,6 +69,7 @@
     XLPopoverView *pop = [XLPopoverView popoverViewWithAttachmentView:sender];
     pop.delegate = self;
     pop.dataArray = [array copy];
+    pop.showAnimation = NO;
     [pop show];
 }
 

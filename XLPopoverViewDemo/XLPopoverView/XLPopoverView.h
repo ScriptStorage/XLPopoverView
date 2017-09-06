@@ -25,6 +25,7 @@
 @property (nonatomic, weak) id<XLPopoverViewDelegate> _Nullable delegate;
 @property (nonatomic, strong) NSArray<XLPopoverCellModel *> * _Nonnull dataArray;
 @property (nonatomic, strong) UIColor * _Nullable popoverColor ;
+@property (nonatomic, assign) BOOL showAnimation;
 
 + (instancetype _Nullable )popoverViewWithAttachmentView:(UIView *_Nonnull)attachmentView ;
 - (void)show ;

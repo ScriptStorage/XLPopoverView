@@ -66,6 +66,7 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
     
     self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:.1];
     self.frame = [UIScreen mainScreen].bounds;
+    self.showAnimation = YES;
     
     UIView *bgView = [UIView new];
 //    bgView.backgroundColor = [UIColor redColor];
@@ -310,9 +311,9 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
     UIView *rootView = [UIApplication sharedApplication].keyWindow.rootViewController.view;
     [rootView addSubview:self];
     
-    [self showPopoverView:YES complete:^{
-        
-    }];
+    if (_showAnimation) {
+        [self showPopoverView:YES complete:nil];
+    }
 }
     
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
@@ -373,9 +374,13 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
 }
     
 - (void)dismissFromSuperView {
-    [self showPopoverView:NO complete:^{
+    if (_showAnimation) {
+        [self showPopoverView:NO complete:^{
+            [self removeFromSuperview];
+        }];
+    }else{
         [self removeFromSuperview];
-    }];
+    }
 }
     
 #pragma mark - UITableViewDelegate and UITableViewDataSource
