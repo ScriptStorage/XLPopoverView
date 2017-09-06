@@ -17,9 +17,19 @@ static CGFloat triangleOffset = 11.0;
 static CGFloat CornerRadius = 5;
 static CGFloat AnimateDuration = 0.25;
 
+typedef NS_ENUM(NSInteger, XLPopoverDirection) {
+    XLPopoverDirectionUp = 0,
+    XLPopoverDirectionLeft,
+    XLPopoverDirectionDown,
+    XLPopoverDirectionRight
+};
+
 @interface XLPopoverView ()<UITableViewDelegate, UITableViewDataSource> {
+    UIView *_backgroundView;
     UITableView *_tableView;
     CAShapeLayer *_triangleLayer;
+    XLPopoverDirection _direction;
+    CGPoint _arrowLocation;
 }
 
 @end
@@ -27,7 +37,7 @@ static CGFloat AnimateDuration = 0.25;
 @implementation XLPopoverView
     
 - (void)dealloc {
-    NSLog(@"[%@ dealloc]", NSStringFromClass([self class]));
+//    NSLog(@"[%@ dealloc]", NSStringFromClass([self class]));
 }
     
 - (instancetype)initWithFrame:(CGRect)frame{
@@ -45,7 +55,37 @@ static CGFloat AnimateDuration = 0.25;
     }
     return self;
 }
+
+- (void)initViews {
     
+    self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.1];
+    self.frame = [UIScreen mainScreen].bounds;
+    
+    UIView *bgView = [UIView new];
+//    bgView.backgroundColor = [UIColor redColor];
+    bgView.clipsToBounds = YES;
+    [self addSubview:bgView];
+    _backgroundView = bgView;
+    
+    UITableView *table = [[UITableView alloc]initWithFrame:CGRectZero style:UITableViewStylePlain];
+    table.delegate = self;
+    table.dataSource = self;
+    table.layer.cornerRadius = CornerRadius;
+    table.layer.masksToBounds = YES;
+    table.showsVerticalScrollIndicator = NO;
+    table.tableFooterView = [UIView new];
+    table.bounces = NO;
+    [bgView addSubview:table];
+    
+    _tableView = table;
+    
+    CAShapeLayer *shaperLayer = [CAShapeLayer layer];
+    shaperLayer.fillColor = [UIColor whiteColor].CGColor;
+    [bgView.layer addSublayer:shaperLayer];
+    _triangleLayer = shaperLayer;
+    
+}
+
 - (void)didMoveToSuperview {
     
     if (!self.superview) {
@@ -58,11 +98,27 @@ static CGFloat AnimateDuration = 0.25;
     CGFloat height = [self calculateHeight];
     CGPoint origin = [self calculateOrigin];
     
-    CGRect frame = _tableView.frame;
+    CGRect frame = CGRectZero;
     frame.origin = origin;
     frame.size.width = width;
     frame.size.height = height;
-    _tableView.frame = frame;
+    _backgroundView.frame = frame;
+    
+    CGFloat tableY = 0.0;
+    switch (_direction) {
+        case XLPopoverDirectionUp:
+            tableY = offset;
+            break;
+            
+        case XLPopoverDirectionDown:
+            tableY = 0.0;
+            break;
+            
+        default:
+            break;
+    }
+    
+    _tableView.frame = CGRectMake(0, tableY, width, height - offset);
     
     _triangleLayer.path = [self trianglePath].CGPath;
     
@@ -73,30 +129,6 @@ static CGFloat AnimateDuration = 0.25;
 }
     
 #pragma mark - 私有方法
-    
-- (void)initViews {
-    
-    self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.1];
-    self.frame = [UIScreen mainScreen].bounds;
-    
-    UITableView *table = [[UITableView alloc]initWithFrame:CGRectZero style:UITableViewStylePlain];
-    table.delegate = self;
-    table.dataSource = self;
-    table.layer.cornerRadius = CornerRadius;
-    table.layer.masksToBounds = YES;
-    table.showsVerticalScrollIndicator = NO;
-    table.tableFooterView = [UIView new];
-    table.bounces = NO;
-    [self addSubview:table];
-    
-    _tableView = table;
-    
-    CAShapeLayer *shaperLayer = [CAShapeLayer layer];
-    shaperLayer.fillColor = [UIColor whiteColor].CGColor;
-    [self.layer addSublayer:shaperLayer];
-    _triangleLayer = shaperLayer;
-    
-}
 
 // 计算tableview原点
 - (CGPoint)calculateOrigin {
@@ -110,9 +142,11 @@ static CGFloat AnimateDuration = 0.25;
     
     CGPoint point = CGPointZero;
     if (upHeight > downHeight) {
-        point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2 - width/2, rect.origin.y - height - offset);
+        point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2 - width/2, rect.origin.y - height);
+        _direction = XLPopoverDirectionDown;
     }else{
-        point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2 - width/2, CGRectGetMaxY(rect) + offset);
+        point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2 - width/2, CGRectGetMaxY(rect));
+        _direction = XLPopoverDirectionUp;
     }
     
     if (point.x < offset) {
@@ -126,7 +160,7 @@ static CGFloat AnimateDuration = 0.25;
     return point;
 }
 
-// 计算tableview高度
+// 计算backgroundView高度
 - (CGFloat)calculateHeight {
     
     // 计算点击触发的view 在当前view的坐标
@@ -146,11 +180,13 @@ static CGFloat AnimateDuration = 0.25;
         }
     }
     
+    tableHeight += offset;
+    
     
     return tableHeight;
 }
   
-// 计算tableview宽度
+// 计算backgroundView宽度
 - (CGFloat)calculateWidth {
     CGFloat width = 0;
     // 遍历并计算title最长的宽度
@@ -172,6 +208,92 @@ static CGFloat AnimateDuration = 0.25;
     
     return width;
 }
+
+// 绘制三角形
+- (UIBezierPath *)trianglePath {
+    
+    CGPoint point = CGPointZero;
+    CGRect rect = [self.attachmentView convertRect:self.attachmentView.bounds toView:self];
+    CGFloat upHeight = rect.origin.y;
+    CGFloat downHeight = self.frame.size.height - CGRectGetMaxY(rect);
+    
+    
+    CGPoint point1, point2;
+    
+    /*
+    switch (_direction) {
+        case XLPopoverDirectionUp:
+        {
+            point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2, CGRectGetMaxY(rect));
+            point1 = CGPointMake(point.x - triangleOffset, point.y + triangleOffset);
+            point2 = CGPointMake(point.x + triangleOffset, point.y + triangleOffset);
+        }
+            break;
+            
+        case XLPopoverDirectionDown:
+        {
+            point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2, CGRectGetMinY(rect));
+            point1 = CGPointMake(point.x - triangleOffset, point.y - triangleOffset);
+            point2 = CGPointMake(point.x + triangleOffset, point.y - triangleOffset);
+        }
+            break;
+            
+        case XLPopoverDirectionLeft:
+        {
+            point = CGPointMake(CGRectGetMaxX(rect), CGRectGetMinY(rect) + rect.size.height/2);
+            point1 = CGPointMake(point.x + triangleOffset, point.y - triangleOffset);
+            point2 = CGPointMake(point.x + triangleOffset, point.y + triangleOffset);
+        }
+            break;
+            
+        case XLPopoverDirectionRight:
+        {
+            point = CGPointMake(CGRectGetMinX(rect), CGRectGetMinY(rect) + rect.size.height/2);
+            point1 = CGPointMake(point.x - triangleOffset, point.y - triangleOffset);
+            point2 = CGPointMake(point.x - triangleOffset, point.y + triangleOffset);
+        }
+            break;
+            
+        default:
+            break;
+    }
+     */
+    
+    // 三角形方向，1为向上，-1未向下
+    NSInteger direction = 1;
+    if (upHeight > downHeight) {
+        direction = -1;
+        point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2, CGRectGetMinY(rect));
+    }else {
+        point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2, CGRectGetMaxY(rect));
+    }
+    
+    
+    if (point.x < 2*offset + 2*CornerRadius) {
+        point.x = 2*offset + 2*CornerRadius;
+    }
+    
+    if (point.x > self.frame.size.width - 2*offset - 2*CornerRadius) {
+        point.x = self.frame.size.width - 2*offset - 2*CornerRadius;
+    }
+    
+    point1 = CGPointMake(point.x - triangleOffset, point.y + direction*triangleOffset);
+    point2 = CGPointMake(point.x + triangleOffset, point.y + direction*triangleOffset);
+    
+    
+    point = [self.layer convertPoint:point toLayer:_backgroundView.layer];
+    _arrowLocation = point;
+    point1 = [self.layer convertPoint:point1 toLayer:_backgroundView.layer];
+    point2 = [self.layer convertPoint:point2 toLayer:_backgroundView.layer];
+    
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:point];
+    [path addLineToPoint:point1];
+    [path addLineToPoint:point2];
+    [path closePath];
+    
+    return path;
+}
     
 - (void)show {
     
@@ -191,11 +313,33 @@ static CGFloat AnimateDuration = 0.25;
     
 - (void)showAnimation {
     
-    self.alpha = 0.1;
+    UIView *animationView = _backgroundView;
+    
+    CGFloat scale = 0.01;
+    
+    CGFloat offsetX =  0.0;
+    CGFloat offsetY =  0.0;
+    
+    // 计算偏移量
+    if (_direction == XLPopoverDirectionUp) {
+        offsetX = -(1 - scale)*(_tableView.frame.size.width/2 - _arrowLocation.x);
+        offsetY = -(1 - scale)*animationView.frame.size.height/2;
+    }else{
+        offsetX = -(1 - scale)*(_tableView.frame.size.width/2 - _arrowLocation.x);
+        offsetY = (1 - scale)*animationView.frame.size.height/2;
+    }
+    
+//    NSLog(@"offsetX: %f, offsetY: %f", offsetX, offsetY);
+    // 动画由小变大
+    animationView.transform = CGAffineTransformMake(scale, 0, 0, scale, offsetX, offsetY);
+    
     [UIView animateWithDuration:AnimateDuration animations:^{
-        self.alpha = 1.0;
-    } completion:^(BOOL finished) {
+        animationView.alpha = 1.0f;
+        animationView.transform = CGAffineTransformMake(1.0f, 0, 0, 1.0f, 0, 0);
         
+    } completion:^(BOOL finished) {
+        //  恢复原位
+        animationView.transform = CGAffineTransformIdentity;
     }];
     
 }
@@ -206,40 +350,6 @@ static CGFloat AnimateDuration = 0.25;
     } completion:^(BOOL finished) {
         [self removeFromSuperview];
     }];
-}
-
-// 绘制三角形
-- (UIBezierPath *)trianglePath {
-    
-    CGPoint point = CGPointZero;
-    CGRect rect = [self.attachmentView convertRect:self.attachmentView.bounds toView:self];
-    CGFloat upHeight = rect.origin.y;
-    CGFloat downHeight = self.frame.size.height - CGRectGetMaxY(rect);
-    
-    // 三角形方向，1为向上，-1未向下
-    NSInteger direction = 1;
-    if (upHeight > downHeight) {
-        direction = -1;
-        point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2, CGRectGetMinY(rect));
-    }else {
-        point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2, CGRectGetMaxY(rect));
-    }
-    
-    if (point.x < 2*offset + 2*CornerRadius) {
-        point.x = 2*offset + 2*CornerRadius;
-    }
-    
-    if (point.x > self.frame.size.width - 2*offset - 2*CornerRadius) {
-        point.x = self.frame.size.width - 2*offset - 2*CornerRadius;
-    }
-    
-    UIBezierPath *path = [UIBezierPath bezierPath];
-    [path moveToPoint:point];
-    [path addLineToPoint:CGPointMake(point.x - triangleOffset, point.y + direction*triangleOffset)];
-    [path addLineToPoint:CGPointMake(point.x + triangleOffset, point.y + direction*triangleOffset)];
-    [path closePath];
-    
-    return path;
 }
     
 #pragma mark - UITableViewDelegate and UITableViewDataSource
