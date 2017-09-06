@@ -66,9 +66,8 @@
         [array addObject:model];
     }
     
-    XLPopoverView *pop = [[XLPopoverView alloc] initWithFrame:self.view.bounds];
+    XLPopoverView *pop = [XLPopoverView popoverViewWithAttachmentView:sender];
     pop.delegate = self;
-    pop.attachmentView = sender;
     pop.dataArray = [array copy];
     [pop show];
 }

@@ -56,6 +56,12 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
     return self;
 }
 
++ (instancetype _Nullable )popoverViewWithAttachmentView:(UIView *_Nonnull)attachmentView {
+    XLPopoverView *popover = [[XLPopoverView alloc] init];
+    popover.attachmentView = attachmentView;
+    return popover;
+}
+
 - (void)initViews {
     
     self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:.1];
