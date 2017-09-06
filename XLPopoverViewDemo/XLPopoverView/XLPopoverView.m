@@ -37,7 +37,7 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
 @implementation XLPopoverView
     
 - (void)dealloc {
-//    NSLog(@"[%@ dealloc]", NSStringFromClass([self class]));
+    NSLog(@"[%@ dealloc]", NSStringFromClass([self class]));
 }
     
 - (instancetype)initWithFrame:(CGRect)frame{
@@ -58,7 +58,7 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
 
 - (void)initViews {
     
-    self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.1];
+    self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:.1];
     self.frame = [UIScreen mainScreen].bounds;
     
     UIView *bgView = [UIView new];
@@ -304,14 +304,16 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
     UIView *rootView = [UIApplication sharedApplication].keyWindow.rootViewController.view;
     [rootView addSubview:self];
     
-    [self showAnimation];
+    [self showPopoverView:YES complete:^{
+        
+    }];
 }
     
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     [self dismissFromSuperView];
 }
     
-- (void)showAnimation {
+- (void)showPopoverView:(BOOL)isShowing complete:(void (^)())complete{
     
     UIView *animationView = _backgroundView;
     
@@ -330,24 +332,42 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
     }
     
 //    NSLog(@"offsetX: %f, offsetY: %f", offsetX, offsetY);
+    
+    CGAffineTransform beginTransform = CGAffineTransformIdentity;
+    CGAffineTransform endTransform = CGAffineTransformIdentity;
+    CGFloat beginAlpha = 0.0;
+    CGFloat endAlpha = 0.0;
+    
+    if (isShowing) {
+        beginTransform = CGAffineTransformMake(scale, 0, 0, scale, offsetX, offsetY);
+        endTransform = CGAffineTransformIdentity;
+        beginAlpha = 0;
+        endAlpha = 1.0;
+    }else{
+        beginTransform = animationView.transform;
+        endTransform = CGAffineTransformMake(scale, 0, 0, scale, offsetX, offsetY);
+        beginAlpha = animationView.alpha;
+        endAlpha = .1;
+    }
+    
     // 动画由小变大
-    animationView.transform = CGAffineTransformMake(scale, 0, 0, scale, offsetX, offsetY);
+    animationView.transform = beginTransform;
+    self.alpha = beginAlpha;
     
     [UIView animateWithDuration:AnimateDuration animations:^{
-        animationView.alpha = 1.0f;
-        animationView.transform = CGAffineTransformMake(1.0f, 0, 0, 1.0f, 0, 0);
+        self.alpha = endAlpha;
+        animationView.transform = endTransform;
         
     } completion:^(BOOL finished) {
-        //  恢复原位
-        animationView.transform = CGAffineTransformIdentity;
+        if (complete) {
+            complete();
+        }
     }];
     
 }
     
 - (void)dismissFromSuperView {
-    [UIView animateWithDuration:AnimateDuration animations:^{
-        self.alpha = 0.0;
-    } completion:^(BOOL finished) {
+    [self showPopoverView:NO complete:^{
         [self removeFromSuperview];
     }];
 }
