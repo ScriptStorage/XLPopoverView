@@ -67,9 +67,10 @@
     }
     
     XLPopoverView *pop = [XLPopoverView popoverViewWithAttachmentView:sender];
+//    pop.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.8];
     pop.delegate = self;
     pop.dataArray = [array copy];
-    pop.showAnimation = NO;
+    pop.showAnimation = YES;
     [pop show];
 }
 

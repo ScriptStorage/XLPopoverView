@@ -38,7 +38,7 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
 @implementation XLPopoverView
 
 - (void)dealloc {
-    NSLog(@"[%@ dealloc]", NSStringFromClass([self class]));
+//    NSLog(@"[%@ dealloc]", NSStringFromClass([self class]));
 }
 
 - (instancetype)initWithFrame:(CGRect)frame{
@@ -70,8 +70,6 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
     self.showAnimation = YES;
     
     UIView *bgView = [UIView new];
-    bgView.backgroundColor = [UIColor redColor];
-    //    bgView.clipsToBounds = YES;
     [self addSubview:bgView];
     _backgroundView = bgView;
     
@@ -160,7 +158,8 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
     // 比较cell高度之和与上下所剩高度，若满足则选择较大者，若不满足则设置_tableView的高度并让其可滑动
     CGFloat maxHeight = upHeight > downHeight ? upHeight : downHeight;
     // 计算table高度
-    CGFloat tableHeight = CellHeight * _dataArray.count;
+    CGFloat defaultHeight = CellHeight * _dataArray.count;
+    CGFloat tableHeight = defaultHeight;
     if (tableHeight > maxHeight - 2*offset) {
         tableHeight = maxHeight - 2*offset;
         _tableView.bounces = YES;
@@ -203,6 +202,11 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
         width = tableWidth;
         height = tableHeight;
         point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2 - width/2, rect.origin.y + rect.size.height);
+        if (point.x + width > self.bounds.size.width - offset) {
+            point = CGPointMake(self.bounds.size.width - offset - width, point.y);
+        }else if (point.x < offset) {
+            point = CGPointMake(offset, point.y);
+        }
         tablePoint = CGPointMake(0, offset);
     }
     
@@ -211,6 +215,11 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
         width = tableWidth;
         height = tableHeight + offset;
         point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2 - width/2, CGRectGetMinY(rect) - height);
+        if (point.x + width > self.bounds.size.width - offset) {
+            point = CGPointMake(self.bounds.size.width - offset - width, point.y);
+        }else if (point.x < offset) {
+            point = CGPointMake(offset, point.y);
+        }
         tablePoint = CGPointMake(0, 0);
     }
     
@@ -219,8 +228,14 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
         width = tableWidth + offset;
         height = tableHeight;
         CGPoint arrowPoint = CGPointMake(CGRectGetMaxX(rect), CGRectGetMinY(rect) + rect.size.height / 2);
-        point = CGPointMake(arrowPoint.x, arrowPoint.y - offset - CornerRadius);
+        point = CGPointMake(arrowPoint.x, arrowPoint.y - CornerRadius - 2*offset);
         tablePoint = CGPointMake(offset, 0);
+        
+        if (point.y + height < self.bounds.size.height - offset && defaultHeight > height ) {
+            CGFloat maxHeight = self.bounds.size.height - offset - point.y;
+            height = maxHeight > defaultHeight ? defaultHeight : maxHeight;
+            tableHeight = height;
+        }
     }
     
     // 箭头在右上方
@@ -228,8 +243,14 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
         width = tableWidth + offset;
         height = tableHeight;
         CGPoint arrowPoint = CGPointMake(CGRectGetMinX(rect) - width, CGRectGetMinY(rect) + rect.size.height / 2);
-        point = CGPointMake(arrowPoint.x, arrowPoint.y - offset - CornerRadius);
+        point = CGPointMake(arrowPoint.x, arrowPoint.y - 2*offset - CornerRadius);
         tablePoint = CGPointMake(0, 0);
+        
+        if (point.y + height < self.bounds.size.height - offset && defaultHeight > height  ) {
+            CGFloat maxHeight = self.bounds.size.height - offset - point.y;
+            height = maxHeight > defaultHeight ? defaultHeight : maxHeight;
+            tableHeight = height;
+        }
     }
     
     // 箭头在左下方
@@ -237,8 +258,16 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
         width = tableWidth + offset;
         height = tableHeight;
         CGPoint arrowPoint = CGPointMake(CGRectGetMaxX(rect), CGRectGetMinY(rect) + rect.size.height / 2);
-        point = CGPointMake(arrowPoint.x, arrowPoint.y + offset + CornerRadius - height);
+        point = CGPointMake(arrowPoint.x, arrowPoint.y + 2*offset + CornerRadius - height);
         tablePoint = CGPointMake(offset, 0);
+        
+        if (point.y > 20 && height < defaultHeight ) {
+            CGFloat maxHeight = point.y + height - 20;
+            CGFloat maxY = point.y + height;
+            height = maxHeight > defaultHeight ? defaultHeight : maxHeight;
+            tableHeight = height;
+            point.y = maxY - height;
+        }
     }
     
     // 箭头在右下方
@@ -246,13 +275,26 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
         width = tableWidth + offset;
         height = tableHeight;
         CGPoint arrowPoint = CGPointMake(CGRectGetMinX(rect) - width, CGRectGetMinY(rect) + rect.size.height / 2);
-        point = CGPointMake(arrowPoint.x, arrowPoint.y + offset + CornerRadius - height);
+        point = CGPointMake(arrowPoint.x, arrowPoint.y + 2*offset + CornerRadius - height);
         tablePoint = CGPointMake(0, 0);
+        
+        if (point.y > 20 && height < defaultHeight ) {
+            CGFloat maxHeight = point.y + height - 20;
+            CGFloat maxY = point.y + height;
+            height = maxHeight > defaultHeight ? defaultHeight : maxHeight;
+            tableHeight = height;
+            point.y = maxY - height;
+        }
     }
     
     _bgFrame = CGRectMake(point.x, point.y, width, height);
     _backgroundView.frame = _bgFrame;
     
+    if (tableHeight == defaultHeight) {
+        _tableView.bounces = NO;
+    }else{
+        _tableView.bounces = YES;
+    }
     _tableView.frame = CGRectMake(tablePoint.x, tablePoint.y, tableWidth, tableHeight);
     
 }
@@ -262,9 +304,6 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
     
     CGPoint point = CGPointZero;
     CGRect rect = [self.attachmentView convertRect:self.attachmentView.bounds toView:self];
-    CGFloat upHeight = rect.origin.y;
-    CGFloat downHeight = self.frame.size.height - CGRectGetMaxY(rect);
-    
     
     CGPoint point1 = CGPointZero, point2 = CGPointZero;
     
@@ -310,31 +349,6 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
         point2 = CGPointMake(point.x - triangleOffset, point.y + triangleOffset);
     }
     
-    
-    /*
-     // 三角形方向，1为向上，-1未向下
-     NSInteger direction = 1;
-     if (upHeight > downHeight) {
-     direction = -1;
-     point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2, CGRectGetMinY(rect));
-     }else {
-     point = CGPointMake(CGRectGetMaxX(rect) - rect.size.width/2, CGRectGetMaxY(rect));
-     }
-     */
-    
-    
-    //    if (point.x < 2*offset + 2*CornerRadius) {
-    //        point.x = 2*offset + 2*CornerRadius;
-    //    }
-    //
-    //    if (point.x > self.frame.size.width - 2*offset - 2*CornerRadius) {
-    //        point.x = self.frame.size.width - 2*offset - 2*CornerRadius;
-    //    }
-    
-    //    point1 = CGPointMake(point.x - triangleOffset, point.y + direction*triangleOffset);
-    //    point2 = CGPointMake(point.x + triangleOffset, point.y + direction*triangleOffset);
-    
-    
     point = [self.layer convertPoint:point toLayer:_backgroundView.layer];
     _arrowLocation = point;
     point1 = [self.layer convertPoint:point1 toLayer:_backgroundView.layer];
@@ -377,12 +391,41 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
     CGFloat offsetY =  0.0;
     
     // 计算偏移量
+    
+    // 箭头在正上方
     if (_direction == XLPopoverDirectionUp) {
         offsetX = -(1 - scale)*(_tableView.frame.size.width/2 - _arrowLocation.x);
         offsetY = -(1 - scale)*animationView.frame.size.height/2;
-    }else{
+    }
+    
+    // 箭头在正下方
+    if (_direction == XLPopoverDirectionDown) {
         offsetX = -(1 - scale)*(_tableView.frame.size.width/2 - _arrowLocation.x);
         offsetY = (1 - scale)*animationView.frame.size.height/2;
+    }
+    
+    // 箭头在左上方
+    if (_direction == (XLPopoverDirectionUp | XLPopoverDirectionLeft)) {
+        offsetX = -(1 - scale)*(animationView.frame.size.width/2);
+        offsetY = -(1 - scale)*(animationView.frame.size.height/2 - _arrowLocation.y );
+    }
+    
+    // 箭头在右上方
+    if (_direction == (XLPopoverDirectionUp | XLPopoverDirectionRight)) {
+        offsetX = (1 - scale)*(animationView.frame.size.width/2);
+        offsetY = -(1 - scale)*(animationView.frame.size.height/2 - _arrowLocation.y );
+    }
+    
+    // 箭头在左下方
+    if (_direction == (XLPopoverDirectionDown | XLPopoverDirectionLeft)) {
+        offsetX = -(1 - scale)*(animationView.frame.size.width/2);
+        offsetY = -(1 - scale)*(animationView.frame.size.height/2 - _arrowLocation.y );
+    }
+    
+    // 箭头在右下方
+    if (_direction == (XLPopoverDirectionDown | XLPopoverDirectionRight)) {
+        offsetX = (1 - scale)*(animationView.frame.size.width/2);
+        offsetY = -(1 - scale)*(animationView.frame.size.height/2 - _arrowLocation.y );
     }
     
     //    NSLog(@"offsetX: %f, offsetY: %f", offsetX, offsetY);
