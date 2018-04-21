@@ -27,7 +27,7 @@
 @property (nonatomic, strong) UIColor * _Nullable popoverColor ;
 @property (nonatomic, assign) BOOL showAnimation;
 
-+ (instancetype _Nullable )popoverViewWithAttachmentView:(UIView *_Nonnull)attachmentView ;
++ (instancetype _Nullable )popoverViewWithAttachmentView:(UIView *_Nonnull)attachmentView images:(NSArray *)images titles:(NSArray *)titles ;
 - (void)show ;
 
 @end

@@ -57,9 +57,17 @@ typedef NS_ENUM(NSInteger, XLPopoverDirection) {
     return self;
 }
 
-+ (instancetype _Nullable )popoverViewWithAttachmentView:(UIView *_Nonnull)attachmentView {
++ (instancetype _Nullable )popoverViewWithAttachmentView:(UIView *_Nonnull)attachmentView images:(NSArray *)images titles:(NSArray *)titles  {
+    NSAssert([attachmentView isKindOfClass:[UIView class]], @"attachmentView 必须为UIView子类!");
+    NSAssert(images.count == titles.count, @"image和title数不匹配!");
+    NSMutableArray *array = [NSMutableArray array];
+    for (int i = 0 ; i < titles.count; i++) {
+        XLPopoverCellModel *model = [XLPopoverCellModel modelWithImage:images[i] title:titles[i]];
+        [array addObject:model];
+    }
     XLPopoverView *popover = [[XLPopoverView alloc] init];
     popover.attachmentView = attachmentView;
+    popover.dataArray = [array copy];
     return popover;
 }
 

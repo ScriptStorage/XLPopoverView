@@ -51,22 +51,23 @@
     
     NSArray *images = @[
                         @"bird73",@"carrot6",@"chat64",@"circle97",@"cloud289",
-                        @"earth199",@"eps13",@"fruit5",@"library17",@"library17",
-                        @"bird73",@"carrot6",@"chat64",@"circle97",@"cloud289",
+//                        @"earth199",@"eps13",@"fruit5",@"library17",@"library17",
+//                        @"bird73",@"carrot6",@"chat64",@"circle97",@"cloud289",
                         ];
     NSArray *titles = @[
                         @"创建群聊",@"加好友/群",@"扫一扫",@"面对面快传",@"付款",
-                        @"拍摄",@"面对面红包",@"创建群聊/或搜索群/或搜索群",@"加好友/群",
+//                        @"拍摄",@"面对面红包",@"创建群聊/或搜索群/或搜索群",@"加好友/群",
 //                        @"创建群聊",@"加好友/群",@"扫一扫",@"面对面快传",@"付款",
                         ];
+    
     NSMutableArray *array = [NSMutableArray array];
     for (int i = 0 ; i < titles.count; i++) {
         XLPopoverCellModel *model = [XLPopoverCellModel modelWithImage:images[i] title:titles[i]];
-//        model.textColor = [UIColor redColor];
+        model.textColor = [UIColor redColor];
         [array addObject:model];
     }
     
-    XLPopoverView *pop = [XLPopoverView popoverViewWithAttachmentView:sender];
+    XLPopoverView *pop = [XLPopoverView popoverViewWithAttachmentView:sender images:images titles:titles];
 //    pop.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.8];
     pop.delegate = self;
     pop.dataArray = [array copy];
